@@ -1,5 +1,3 @@
-
-
 my $filename = 'parsed_tax_name.txt';
 my $write_file = "sci2tax.pl";
 open(IN, '<', $filename)

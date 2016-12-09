@@ -1,4 +1,4 @@
-%name_to_id = (
+%sci2tax = (
 "Aedes albopictus densovirus (isolate Boublik/1994)" => 648330, 
 "Adeno-associated virus 2" => 10804, 
 "Adeno-associated virus 2 (isolate Srivastava/1982)" => 648242, 
