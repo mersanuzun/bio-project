@@ -1,7 +1,7 @@
 
 
-my $filename = 'parsedtext1.txt';
-my $write_file = "name_to_id";
+my $filename = 'parsed_tax_name.txt';
+my $write_file = "sci2tax.pl";
 open(IN, '<', $filename)
   or die "Could not open file '$filename' $!";
 open(my $out, ">", $write_file)
