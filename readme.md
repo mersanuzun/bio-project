@@ -10,7 +10,7 @@ Tools : Perl, Unix Commands<br>
 - [x] We will get INTERPRO(protein domain) domain identifiers for these proteins.
 - [ ] We will show common INTERPRO domain identifiers for all given these proteins.
 - [ ] We will show how frequent these INTERPROs for all given organisms.
-- [ ] Finally we will report that  show tthe users INTERPRO statistics  & Common Proteins.
+- [ ] Finally we will report that  show the users INTERPRO statistics  & Common Proteins.
 
 
 
