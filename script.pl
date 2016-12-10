@@ -3,22 +3,24 @@ use LWP::UserAgent;
 my $ua = LWP::UserAgent->new;
 my @organisms = ();
 my $search_term = "";
-my $s = $ARGV[0];
+my $splitter = $ARGV[0];
 foreach my $arg (@ARGV) {
   if ($arg eq "-o"){
-    $s = "-o";
+    $splitter = "-o";
     next;
   } elsif ($arg eq "-s"){
-    $s = "-s";
+    $splitter = "-s";
     next;
   }
-  if ($s eq "-o"){
+  if ($splitter eq "-o"){
+    if ($arg =~ /^[^0-9]*$/){
+      $arg = $sci2tax{$arg};
+    }
     push(@organisms, $arg);
-  }elsif ($s eq "-s"){
+  }elsif ($splitter eq "-s"){
     $search_term = $arg;
   }
 }
-
 
 
 foreach my $organism (@organisms) {
@@ -26,12 +28,15 @@ foreach my $organism (@organisms) {
   my $response = $ua->get($url);
   if ($response->is_success) {
     $content = $response->decoded_content;
-     if ($content eq ""){
-      print "YOK";
-     }else {
-      print $content;
-     }
+    my @lines = split /\n/, $content;
+    print "$organism\n";
+    foreach my $line (@lines) {
+      if ($line =~ /(IPR.*);\s(.*)\./){
+        print "$1\n";
+      }
+    }
   }else{
-     die $response->status_line;
+    print "$organism could not be fetched";
+    die $response->status_line;
   }
 }
