@@ -1,9 +1,16 @@
-require "sci2tax.pl";
 use LWP::UserAgent;
 my $ua = LWP::UserAgent->new;
 my @organisms = ();
 my $search_term = "";
 my $splitter = $ARGV[0];
+$base_path = "sci2tax.pl";
+if (-e $base_path) {
+  print "$base_path exists!\n";
+}else{
+  print "File is not exist, please wait while downloading... \n";
+  require "hash_parser.pl";
+}
+
 foreach my $arg (@ARGV) {
   if ($arg eq "-o"){
     $splitter = "-o";
