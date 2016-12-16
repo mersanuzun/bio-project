@@ -3,6 +3,8 @@ my $ua = LWP::UserAgent->new;
 my @organisms = ();
 my $search_term = "";
 my $splitter = $ARGV[0];
+
+# sci2tax.pl dosyası varmı yokmu bakar ve oluşturur.
 $base_path = "sci2tax.pl";
 if (-e $base_path) {
   print "$base_path exists!\n";
@@ -42,6 +44,9 @@ if (-e $base_path) {
     print $out $all_tax
 }
 
+
+#--------------
+
 foreach my $arg (@ARGV) {
   if ($arg eq "-o"){
     $splitter = "-o";
@@ -59,7 +64,8 @@ foreach my $arg (@ARGV) {
     $search_term = $arg;
   }
 }
-my %hash_deneme;
+
+
 my %fetched_organisim = {};
 my $protein_counter;
 foreach my $organism (@organisms) {
@@ -111,10 +117,13 @@ foreach my $organism (@organisms) {
   }
   print "\n";
   print "protein count: $protein_counter\n\n";
-  $protein_counter = 0; 
+   
 
-  print "********************\n";
+  
 }
+
+$protein_counter = 0;
+print "********************\n";
 
 
 
