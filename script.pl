@@ -2,7 +2,7 @@ use LWP::UserAgent;
 my $ua = LWP::UserAgent->new;
 my @organisms = ();
 my $search_term = "";
-my $out_format = "";
+my $out_format = "txt";
 my $splitter = $ARGV[0];
 # sci2tax.pl dosyası varmı yokmu bakar ve oluşturur.
 $base_path = "sci2tax.pl";
@@ -66,9 +66,8 @@ my @common_IPRs = ();
 
 foreach my $organism (@organisms) {
   $url = "http://www.uniprot.org/uniprot/?sort=score&desc=&compress=no&query=taxonomy:$organism\"$search_term\"&fil=&format=txt&force=yes";  
-  my $response = $ua->get($url);
-
   print "$organism is fetching from uniprot.\n";
+  my $response = $ua->get($url);
   if ($response->is_success) {
     $content = $response->decoded_content;
     my @proteins = split(/\/\/\s/, $content);
@@ -195,22 +194,64 @@ sub print_all_html{
   my $file_name = "all.html";
   open(my $out, '>', $file_name)
   or die "Could not open file ";
-
   print $out "<!DOCTYPE html>
   <html>
   <head>
+    <style>
+      .organism{
+        margin: 5px;
+
+      }
+      .organism_title{
+        background: #443918;
+        color: #e1f7f7;
+        margin: 10px;
+        padding: 5px;
+        text-align: center;
+        border-radius: 10px;
+      }
+      .protein{
+        margin: 10px;
+        padding: 5px;
+        background:  #c18762;
+        border-radius: 10px;
+        display: inline-table;
+        width: 300px;
+        min-width: 300px;
+      }
+      .protein_name{
+        text-align: center;
+        font-size: 17px;
+      }
+      a:link {
+        text-decoration: none;
+        color: #372ac1;
+      }
+      a:hover {
+        text-decoration: underline
+      }
+      a:visited {
+        color: #372ac1;
+      }
+      .ipr{
+        margin: 5px;
+      }
+      .ipr_name{
+        margin-left: 10px;
+      }
+    </style>
   <title>Bioinformatics</title>
   </head>
   <body>"; 
-
   foreach my $organism (sort keys %fetched_organisim) {
-    print $out "<div class='organism' style=\"background:aqua\">";
-    print $out "<h1>Organism:\t", $organism, "</h1>";
+    print $out "<div class='organism'>";
+    print $out "<h1 class=\"organism_title\">Organism:\t", $organism, "</h1>";
     foreach my $protein (sort keys %{$fetched_organisim{$organism}}){
-      print $out "<br>", "<a style='padding-left:3em;padding-right:3em;' href='http://www.uniprot.org/uniprot/$protein'>$protein</a>";
+      print $out "<div class=\"protein\"><b><div class=\"protein_name\"><a target=\"_blank\" href='http://www.uniprot.org/uniprot/$protein'>$protein</a></div></b>";
       foreach my $IPR (sort keys %{$fetched_organisim{$organism}{$protein}}){
-        print $out "<br>", "<a style='padding-left:3em;padding-right:3em;' href='https://www.ebi.ac.uk/interpro/entry/$IPR'>$IPR</a>" , $fetched_organisim{$organism}{$protein}{$IPR} , "\n";
+        print $out "<div class=\"ipr\"><a target=\"_blank\" href='https://www.ebi.ac.uk/interpro/entry/$IPR'>$IPR</a><span class=\"ipr_name\">" , $fetched_organisim{$organism}{$protein}{$IPR} , "</span></div>";
       }
+      print $out "</div>";
     }
     print $out "</div>\n";
   }
@@ -223,7 +264,7 @@ sub print_all_html{
 
 
 sub print_frequencies_html{
-  my $file_name = "ipr_frequency.html";
+  my $file_name = "ipr_frequencies.html";
   open(my $out, '>', $file_name)
     or die "Could not open file ";
 
@@ -249,7 +290,7 @@ sub print_frequencies_html{
 
 
 sub print_common_iprs_html {
-  $file_name = "ipr_commons.html";
+  $file_name = "common_iprs.html";
   open(my $out, '>', $file_name)
     or die "Could not open file ";
 
