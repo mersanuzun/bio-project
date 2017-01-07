@@ -2,16 +2,17 @@ use LWP::UserAgent;
 my $ua = LWP::UserAgent->new;
 my @organisms = ();
 my $search_term = "";
+my $out_format = "";
 my $splitter = $ARGV[0];
 # sci2tax.pl dosyası varmı yokmu bakar ve oluşturur.
 $base_path = "sci2tax.pl";
 if (! -e $base_path) {
-  print "File not exist, please wait while downloading...\n";
+  print "Speclist not exist, please wait while downloading...\n";
     $url = "http://www.uniprot.org/docs/speclist.txt";
     my $response = $ua->get($url);
     if ($response->is_success) {
         $content = $response->decoded_content;
-        print "successfully Loaded.. \n";
+        print "Speclist was successfully loaded.. \n";
     }else{
         print "Not successfull try again..\n";
         die $response->status_line;
@@ -43,6 +44,9 @@ foreach my $arg (@ARGV) {
   } elsif ($arg eq "-s"){
     $splitter = "-s";
     next;
+  }elsif ($arg eq "-out"){
+    $splitter = "-out";
+    next;
   }
   if ($splitter eq "-o"){
     if ($arg =~ /^[^0-9]*$/){
@@ -51,9 +55,10 @@ foreach my $arg (@ARGV) {
     push(@organisms, $arg);
   }elsif ($splitter eq "-s"){
     $search_term = $arg;
+  }elsif ($splitter eq "-out"){
+    $out_format = $arg;
   }
 }
-
 
 my %fetched_organisim;
 my %IPR_frequency = ();
@@ -99,6 +104,34 @@ foreach my $organism (keys %IPR_frequency){
         push @common_IPRs, $ipr;
       }
     }
+  }
+}
+
+sub isPushed {
+  (my $ipr) = @_;
+  foreach (@common_IPRs){
+    #print $_->{"id"}, "\n";
+    if ($ipr eq $_){
+      return 1;
+    }
+  }
+  return 0;
+}
+
+sub isCommon {
+  (my $ipr) = @_;
+  my $counter = 0;
+  foreach $organism (keys %IPR_frequency){
+    if(exists $IPR_frequency{$organism}{$ipr}){
+      $counter++;
+    }else{
+      return 0;
+    }
+  }
+  if ($counter == scalar keys %IPR_frequency){
+    return 1;
+  }else{
+    return 0;
   }
 }
 
@@ -154,34 +187,103 @@ sub print_common_iprs {
   print "Common INTERPROs were printed to $file_name.\n";
 }
 
-sub isPushed {
-  (my $ipr) = @_;
-  foreach (@common_IPRs){
-    #print $_->{"id"}, "\n";
-    if ($ipr eq $_){
-      return 1;
+
+
+
+
+sub print_all_html{
+  my $file_name = "all.html";
+  open(my $out, '>', $file_name)
+  or die "Could not open file ";
+
+  print $out "<!DOCTYPE html>
+  <html>
+  <head>
+  <title>Bioinformatics</title>
+  </head>
+  <body>"; 
+
+  foreach my $organism (sort keys %fetched_organisim) {
+    print $out "<div class='organism' style=\"background:aqua\">";
+    print $out "<h1>Organism:\t", $organism, "</h1>";
+    foreach my $protein (sort keys %{$fetched_organisim{$organism}}){
+      print $out "<br>", "<a style='padding-left:3em;padding-right:3em;' href='http://www.uniprot.org/uniprot/$protein'>$protein</a>";
+      foreach my $IPR (sort keys %{$fetched_organisim{$organism}{$protein}}){
+        print $out "<br>", "<a style='padding-left:3em;padding-right:3em;' href='https://www.ebi.ac.uk/interpro/entry/$IPR'>$IPR</a>" , $fetched_organisim{$organism}{$protein}{$IPR} , "\n";
+      }
     }
+    print $out "</div>\n";
   }
-  return 0;
+
+  print $out "
+  </body>
+  </html> ";
+  print "All organism informations were printed to $file_name.\n";
 }
 
-sub isCommon {
-  (my $ipr) = @_;
-  my $counter = 0;
+
+sub print_frequencies_html{
+  my $file_name = "ipr_frequency.html";
+  open(my $out, '>', $file_name)
+    or die "Could not open file ";
+
+  print $out "<!DOCTYPE html>
+  <html>
+  <head>
+  <title>Bioinformatics</title>
+  </head>
+  <body>"; 
   foreach $organism (keys %IPR_frequency){
-    if(exists $IPR_frequency{$organism}{$ipr}){
-      $counter++;
-    }else{
-      return 0;
+    print $out "Organism : ", $organism, "\n" ;
+    foreach $ipr (keys %{$IPR_frequency{$organism}}){   
+      print $out "<br>", $IPR_frequency{$organism}{$ipr}{"count"}, " \t", "<a style='padding-left:3em;padding-right:3em;' href='https://www.ebi.ac.uk/interpro/entry/$ipr'>$ipr</a>", "\t", $IPR_frequency{$organism}{$ipr}{"name"} ;
     }
   }
-  if ($counter == scalar keys %IPR_frequency){
-    return 1;
-  }else{
-    return 0;
-  }
+  print $out "
+  </body>
+  </html> ";
+  print "IPR frequencies were printed to $file_name.\n";
 }
 
-print_all();
-print_frequencies("true");
-print_common_iprs();
+
+
+
+sub print_common_iprs_html {
+  $file_name = "ipr_commons.html";
+  open(my $out, '>', $file_name)
+    or die "Could not open file ";
+
+  print $out "<!DOCTYPE html>
+  <html>
+  <head>
+  <title>Bioinformatics</title>
+  </head>
+  <body>"; 
+  print $out "Organisms\t";
+  print $out "$_\t" foreach (keys %IPR_frequency), "\n";
+  print $out "\n";
+  foreach $ipr (@common_IPRs){
+    print $out  "<br>", "<a href='https://www.ebi.ac.uk/interpro/entry/$ipr'>$ipr</a>" ;
+  }
+  print $out "
+  </body>
+  </html> ";
+  print "Common INTERPROs were printed to $file_name.\n";
+}
+
+if ($out_format eq "txt"){
+  print_all();
+  print_frequencies("true");
+  print_common_iprs();  
+}elsif ($out_format eq "html"){
+  print_all_html();
+  print_frequencies_html();
+  print_common_iprs_html();
+}elsif ($out_format eq "all"){
+  print_all();
+  print_frequencies("true");
+  print_common_iprs();
+  print_all_html();
+  print_frequencies_html();
+  print_common_iprs_html();
+}
