@@ -16,7 +16,8 @@ Tools : Perl, Unix Commands<br>
 ```
 perl script.pl -o 9640 10090 "Mus musculus" -s "Glucose Metabolism"
 ```
-To run script we need to give taxonomy ids or scientific names or both after -o .
+To run script we need to give taxonomy ids or scientific names or both after -o.
+
 Also we can give search term after -s .
 
 
