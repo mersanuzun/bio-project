@@ -19,7 +19,8 @@ perl script.pl -o 9640 10090 "Mus musculus" -s "Glucose Metabolism"
 To run script;
 
  - We need to give taxonomy ids or scientific names or both after -o.
- - Also we can give search term after -s .
+ - Also we can give search term after -s.
+ - For output, give a format after -out (html, txt, all).
 
 
 ##Presentation & Report
