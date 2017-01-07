@@ -323,7 +323,7 @@ sub print_frequencies_html{
     foreach $ipr (@organisim_ipr){   
       print $out "<tr>";
       print $out "<td><span class=\"frequency\">", $IPR_frequency{$organism}{$ipr}{"count"}, "</span></td>";
-      print $out "<td><span class=\"ipr_id\"><a href='https://www.ebi.ac.uk/interpro/entry/$ipr'>$ipr</a></span></td>";
+      print $out "<td><span class=\"ipr_id\"><a target=\"_blank\" href='https://www.ebi.ac.uk/interpro/entry/$ipr'>$ipr</a></span></td>";
       print $out "<td><span class=\"ipr_name\">", $IPR_frequency{$organism}{$ipr}{"name"}, "</span></td>";
       print $out "</tr>";
     }
@@ -346,14 +346,32 @@ sub print_common_iprs_html {
   print $out "<!DOCTYPE html>
   <html>
   <head>
+    <style>
+      .organisms{
+        font-size: x-large;
+        margin: 5px;
+      }
+      .ipr_id{
+        font-size: 18px;
+        margin: 5px;
+      }
+      a:link {
+        text-decoration: none;
+        color: #372ac1;
+      }
+      a:hover {
+        text-decoration: underline
+      }
+      a:visited {
+        color: #372ac1;
+      }
+    </style>
   <title>Bioinformatics</title>
   </head>
   <body>"; 
-  print $out "Organisms\t";
-  print $out "$_\t" foreach (keys %IPR_frequency), "\n";
-  print $out "\n";
+  print $out "<div class=\"organisms\">Organisms " . join(", ", keys %fetched_organisim), "</div>";
   foreach $ipr (@common_IPRs){
-    print $out  "<br>", "<a href='https://www.ebi.ac.uk/interpro/entry/$ipr'>$ipr</a>" ;
+    print $out  "<div class=\"ipr_id\">", "<a target=\"_blank\" href='https://www.ebi.ac.uk/interpro/entry/$ipr'>$ipr</a></div>";
   }
   print $out "
   </body>
