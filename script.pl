@@ -271,14 +271,63 @@ sub print_frequencies_html{
   print $out "<!DOCTYPE html>
   <html>
   <head>
+  <style>
+    .organism{
+      margin: 5px;
+    }  
+    .organism_title{
+       background: #443918;
+       color: #e1f7f7;
+       margin: 10px;
+       padding: 5px;
+       text-align: center;
+       border-radius: 10px;
+    }
+    .ipr{
+      margin: 10px;
+    }
+    table{
+      margin: 10px;
+    }
+    a:link {
+      text-decoration: none;
+      color: #372ac1;
+    }
+    a:hover {
+      text-decoration: underline
+    }
+    a:visited {
+      color: #372ac1;
+    }
+    td{
+      padding: 5px;
+    }
+    th{
+      padding: 10px;
+    }
+  </style>
   <title>Bioinformatics</title>
   </head>
   <body>"; 
   foreach $organism (keys %IPR_frequency){
-    print $out "Organism : ", $organism, "\n" ;
-    foreach $ipr (keys %{$IPR_frequency{$organism}}){   
-      print $out "<br>", $IPR_frequency{$organism}{$ipr}{"count"}, " \t", "<a style='padding-left:3em;padding-right:3em;' href='https://www.ebi.ac.uk/interpro/entry/$ipr'>$ipr</a>", "\t", $IPR_frequency{$organism}{$ipr}{"name"} ;
+    print $out "<h1 class=\"organism_title\">Organism:\t", $organism, "</h1>";
+    print $out "<table border=\"1\">";
+    print $out "<th>Frequency</th>";
+    print $out "<th>IPR ID</th>";
+    print $out "<th>IPR Name</th>";
+    if ($isSort eq "true"){
+      @organisim_ipr = sort {$IPR_frequency{$organism}{$b}{count} <=> $IPR_frequency{$organism}{$a}{count}} keys %{$IPR_frequency{$organism}};
+    }else{
+      @organisim_ipr = keys %{$IPR_frequency{$organism}};
     }
+    foreach $ipr (@organisim_ipr){   
+      print $out "<tr>";
+      print $out "<td><span class=\"frequency\">", $IPR_frequency{$organism}{$ipr}{"count"}, "</span></td>";
+      print $out "<td><span class=\"ipr_id\"><a href='https://www.ebi.ac.uk/interpro/entry/$ipr'>$ipr</a></span></td>";
+      print $out "<td><span class=\"ipr_name\">", $IPR_frequency{$organism}{$ipr}{"name"}, "</span></td>";
+      print $out "</tr>";
+    }
+    print $out "</table>";
   }
   print $out "
   </body>
@@ -318,13 +367,13 @@ if ($out_format eq "txt"){
   print_common_iprs();  
 }elsif ($out_format eq "html"){
   print_all_html();
-  print_frequencies_html();
+  print_frequencies_html("true");
   print_common_iprs_html();
 }elsif ($out_format eq "all"){
   print_all();
   print_frequencies("true");
   print_common_iprs();
   print_all_html();
-  print_frequencies_html();
+  print_frequencies_html("true");
   print_common_iprs_html();
 }
