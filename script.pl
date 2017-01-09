@@ -20,7 +20,7 @@ if (! -e $base_path) {
     my $write_file = "sci2tax.pl";
     open(my $out, ">", $write_file)
     or die "Could not open file $write_file";
-    $all_tax = "%name_to_id = (\n";
+    $all_tax = "%sci2tax = (\n";
     
     my @lines = split /\n/, $content;
     foreach my $line (@lines) {
@@ -33,7 +33,7 @@ if (! -e $base_path) {
     $all_tax .= ");";
     print $out $all_tax
 }
-
+require "sci2tax.pl";
 
 #--------------
 
