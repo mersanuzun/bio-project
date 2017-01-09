@@ -19,7 +19,7 @@
  
 ##Usage
 ```
-perl script.pl -o 9640 10090 "Mus musculus" -s "Glucose Metabolism"
+perl script.pl -o 9640 10090 "Rattus norvegicus" -s "Glucose Metabolism" -out "html"
 ```
 To run script;
 
